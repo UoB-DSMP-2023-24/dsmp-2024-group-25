@@ -1,9 +1,14 @@
 # Group Repository for the Data Science Mini-Project (EMATM0050)
 
 ## Please edit the fields below with your information
-Group Number: 
+Group Number: 25
 
 Problem Assigned: 
 
-Group Members:
+1. How far is the project going to go? Are there more specific goals?
 
+2. When do we get the second dataset?
+
+Group Members: Bohan Liu, Shuyao Yi, Haolong Li
+
+Week 14: GitHub Setup，Project Setup
