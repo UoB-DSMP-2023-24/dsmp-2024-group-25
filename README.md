@@ -12,3 +12,5 @@ Problem Assigned:
 Group Members: Bohan Liu, Shuyao Yi, Haolong Li
 
 Week 14: GitHub Setup，Project Setup
+
+Week 15: Dataset Feature Visualisation, Basic Algorithm Setup (Decision Tree)
