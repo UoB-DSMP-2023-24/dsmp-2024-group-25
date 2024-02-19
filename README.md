@@ -16,3 +16,5 @@ Week 14: GitHub Setup，Project Setup
 Week 15: Dataset Feature Visualisation, Basic Algorithm Setup (Decision Tree)
 
 Week 16: Data Resturcture, RFM and other Business Model Learning, Isolation Forest
+
+Week 17: Multiple types of models implementation
