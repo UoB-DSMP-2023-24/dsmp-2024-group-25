@@ -2,7 +2,7 @@ import pandas as pd
 from pandas import ExcelWriter
 
 # load the dataset
-data_path = 'D:/TB2/DSMP/sample_new.xlsx'
+data_path = 'D:/TB2/DSMP/balance.xlsx'
 data = pd.read_excel(data_path)
 
 # check the date format
@@ -26,12 +26,8 @@ target_account_activity = data.groupby('to_randomly_generated_account').agg(
     total_transaction_amount=pd.NamedAgg(column='monopoly_money_amount', aggfunc='sum')
 ).reset_index()
 
-# save the output
-output_path_source = 'D:/TB2/DSMP/source_account_activity.xlsx'  
-output_path_target = 'D:/TB2/DSMP/target_account_activity.xlsx'  
+# Add to the balance.xlsx
+data = data.merge(source_account_activity, on='from_totally_fake_account', how='left')
+data = data.merge(target_account_activity, on='to_randomly_generated_account', how='left')
 
-with ExcelWriter(output_path_source) as writer:
-    source_account_activity.to_excel(writer, index=False, sheet_name='Source Account Activity')
-
-with ExcelWriter(output_path_target) as writer:
-    target_account_activity.to_excel(writer, index=False, sheet_name='Target Account Activity')
+data.to_excel(data_path, index=False)
