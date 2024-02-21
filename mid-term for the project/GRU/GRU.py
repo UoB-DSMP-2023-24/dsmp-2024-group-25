@@ -7,11 +7,13 @@ from keras.utils import pad_sequences
 from keras.optimizers import Adam
 import numpy as np
 import re
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 df = pd.read_csv('fake_transactional_data_24_backup.csv')
 
 df['not_happened_yet_date'] = pd.to_datetime(df['not_happened_yet_date'])
-df['year_week'] = df['not_happened_yet_date'].dt.strftime('%Y-%U')
+
 
 #data restructure
 food_and_drinks = ['A_CAFE', 'A_LOCAL_COFFEE_SHOP', 'CAFE', 'CHINESE_RESTAURANT', 'CHINESE_TAKEAWAY', 'COFFEE_SHOP', 'GOURMET_COFFEE_SHOP', 'HIPSTER_COFFEE_SHOP', 'INDIAN_RESTAURANT', 'KEBAB_SHOP', 'LOCAL_RESTAURANT', 'LUNCH_PLACE', 'LUNCH_VAN', 'PRETENTIOUS_COFFEE_SHOP', 'RESTAURANT', 'RESTAURANT_VOUCHER', 'ROASTERIE', 'SANDWICH_SHOP', 'SEAFOOD_RESAURANT', 'STEAK_HOUSE', 'TAKEAWAY', 'TAKEAWAY_CURRY', 'TOTALLY_A_REAL_COFFEE_SHOP']
@@ -49,88 +51,114 @@ def replace_account_names(name, a, b, c, d, e, f):
 #restructure
 df['to_randomly_generated_account'] = df['to_randomly_generated_account'].apply(lambda x: replace_account_names(x, food_and_drinks, groceries_and_ds, clothing_and_jewellery, outdoor, indoor, daily_implement))
 
-# 找到monopoly_money_amount大于10的行的索引
+
 indices_to_drop = df[df['to_randomly_generated_account'] == 'transaction'].index
 
 # 删除这些行
 df = df.drop(indices_to_drop)
 
-weekly_sales = df.groupby(['to_randomly_generated_account', 'year_week'])['monopoly_money_amount'].sum().reset_index()
+daily_sales = df.groupby(['to_randomly_generated_account', 'not_happened_yet_date'])['monopoly_money_amount'].sum().reset_index()
 
-# fd_sales = weekly_sales[weekly_sales['to_randomly_generated_account'] == 'Food & Drink']
+fd_sales = daily_sales[daily_sales['to_randomly_generated_account'] == 'Daily Purchase']
 
-# # 数据标准化
-# scaler = MinMaxScaler(feature_range=(0, 1))
-# fd_sales['scaled_amount'] = scaler.fit_transform(fd_sales[['monopoly_money_amount']])
+# 数据标准化
+scaler = MinMaxScaler(feature_range=(0, 1))
+fd_sales['scaled_amount'] = scaler.fit_transform(fd_sales[['monopoly_money_amount']])
 
-# time_steps = 2
+time_steps = 2
 
-# X, y = [], []
+X, y = [], []
 
-# for i in range(len(fd_sales) - time_steps):
-#     X.append(fd_sales['scaled_amount'].iloc[i:i+time_steps].values)
-#     y.append(fd_sales['scaled_amount'].iloc[i+time_steps])
+for i in range(len(fd_sales) - time_steps):
+    X.append(fd_sales['scaled_amount'].iloc[i:i+time_steps].values)
+    y.append(fd_sales['scaled_amount'].iloc[i+time_steps])
 
-# X, y = np.array(X), np.array(y)
+X, y = np.array(X), np.array(y)
 
-# X = np.reshape(X, (X.shape[0], X.shape[1], 1))
+X = np.reshape(X, (X.shape[0], X.shape[1], 1))
 
-# # 定义GRU模型
-# model = Sequential()
-# model.add(GRU(units=50, return_sequences=False, input_shape=(time_steps, 1)))
-# model.add(Dense(1))
+# 定义GRU模型
+model = Sequential()
+model.add(GRU(units=50, return_sequences=False, input_shape=(time_steps, 1)))
+model.add(Dense(1))
 
-# # 编译模型
-# model.compile(optimizer=Adam(learning_rate=0.01), loss='mean_squared_error', metrics=['accuracy'])
+# 编译模型
+model.compile(optimizer=Adam(learning_rate=0.01), loss='mean_squared_error', metrics=['accuracy'])
 
-# # 划分训练集和测试集
-# split_idx = int(len(X) * 0.8)
-# X_train, X_test = X[:split_idx], X[split_idx:]
-# y_train, y_test = y[:split_idx], y[split_idx:]
+# 划分训练集和测试集
+split_idx = int(len(X) * 0.8)
+X_train, X_test = X[:split_idx], X[split_idx:]
+y_train, y_test = y[:split_idx], y[split_idx:]
 
-# # 训练模型
-# history = model.fit(X_train, y_train, epochs=20, batch_size=32, validation_data=(X_test, y_test), verbose=1)
+# 训练模型
+history = model.fit(X_train, y_train, epochs=10, batch_size=4, validation_data=(X_test, y_test), verbose=1)
+y_pred = model.predict(X_test)
+
+test_dates = pd.date_range(start=daily_sales['not_happened_yet_date'].max() - pd.Timedelta(days=len(y_test) - 1), periods=len(y_test), freq='D')
+
+# 绘制实际值
+plt.figure(figsize=(15, 5))
+plt.plot_date(test_dates, y_test, 'b-', label='Actual')
+
+# 绘制预测值
+plt.plot_date(test_dates, y_pred, 'r-', label='Predicted')
+
+# 设置图表标题和标签
+plt.title('Actual and Predicted Sales')
+plt.xlabel('Date')
+plt.ylabel('Daily Sales Amount')
+
+# 美化x轴日期显示
+plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=10))  # 每隔10天显示一次日期
+plt.gcf().autofmt_xdate()  # 自动旋转日期标记
+
+# 显示图例
+plt.legend()
+
+# 显示图表
+plt.show()
 
 
-def generate_series_data(weekly_sales, account_type, n_steps):
-    scaler = MinMaxScaler(feature_range=(0, 1))
+# def generate_series_data(weekly_sales, account_type, n_steps):
+#     scaler = MinMaxScaler(feature_range=(0, 1))
     
-    # 获取一个商户类型的销售数据
-    sales_data = weekly_sales[weekly_sales['to_randomly_generated_account'] == account_type]
-    total_sales = sales_data['monopoly_money_amount'].values.reshape(-1, 1)
-    scaled_sales = scaler.fit_transform(total_sales)
+#     # 获取一个商户类型的销售数据
+#     sales_data = weekly_sales[weekly_sales['to_randomly_generated_account'] == account_type]
+#     total_sales = sales_data['monopoly_money_amount'].values.reshape(-1, 1)
+#     scaled_sales = scaler.fit_transform(total_sales)
     
-    # 序列化时间序列数据
-    X, y = [], []
-    for i in range(len(scaled_sales) - n_steps):
-        X.append(scaled_sales[i:i+n_steps])
-        y.append(scaled_sales[i+n_steps])
+#     # 序列化时间序列数据
+#     X, y = [], []
+#     for i in range(len(scaled_sales) - n_steps):
+#         X.append(scaled_sales[i:i+n_steps])
+#         y.append(scaled_sales[i+n_steps])
     
-    return np.array(X), np.array(y)
+#     return np.array(X), np.array(y)
 
-def build_and_train_model(X, y):
-    # 数据集再分割为训练集和测试集
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# def build_and_train_model(X, y):
+#     # 数据集再分割为训练集和测试集
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
-    # 初始化GRU模型
-    model = Sequential()
-    model.add(GRU(units=50, activation='relu', input_shape=(X_train.shape[1], 1)))
-    model.add(Dense(units=1))
-    model.compile(optimizer=Adam(learning_rate=0.01), loss='mean_squared_error', metrics=['accuracy'])
+#     # 初始化GRU模型
+#     model = Sequential()
+#     model.add(GRU(units=50, activation='relu', input_shape=(X_train.shape[1], 1)))
+#     model.add(Dense(units=1))
+#     model.compile(optimizer=Adam(learning_rate=0.1), loss='mean_squared_error', metrics=['accuracy'])
     
-    # 训练模型
-    model.fit(X_train, y_train, epochs=30, batch_size=4, validation_data=(X_test, y_test))
+#     # 训练模型
+#     model.fit(X_train, y_train, epochs=10, batch_size=2, validation_data=(X_test, y_test))
     
-    return model
+#     return model
 
-merchant_types = weekly_sales['to_randomly_generated_account'].unique()
+# merchant_types = daily_sales['to_randomly_generated_account'].unique()
 
-n_steps = 4  # 假设过去4个时间步长（周）为基础
+# n_steps = 200  # 假设过去4个时间步长（周）为基础
 
-for m_type in merchant_types:
-    print(f"Processing: {m_type}")
-    X, y = generate_series_data(weekly_sales, m_type, n_steps)
-    X = X.reshape(X.shape[0], X.shape[1], 1)  # 重塑以符合GRU的输入格式
-    m_model = build_and_train_model(X, y)
-    # 这里可以加上保存模型的步骤
+# for m_type in merchant_types:
+#     print(f"Processing: {m_type}")
+#     X, y = generate_series_data(daily_sales, m_type, n_steps)
+#     X = X.reshape(X.shape[0], X.shape[1], 1)  # 重塑以符合GRU的输入格式
+#     m_model = build_and_train_model(X, y)
+    
 
