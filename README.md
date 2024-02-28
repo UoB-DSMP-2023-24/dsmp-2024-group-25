@@ -18,3 +18,5 @@ Week 15: Dataset Feature Visualisation, Basic Algorithm Setup (Decision Tree)
 Week 16: Data Resturcture, RFM and other Business Model Learning, Isolation Forest
 
 Week 17: Multiple types of models implementation
+
+Week 18: Reading Week, Project Reorganisation
