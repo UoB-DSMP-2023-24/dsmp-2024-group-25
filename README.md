@@ -20,3 +20,5 @@ Week 16: Data Resturcture, RFM and other Business Model Learning, Isolation Fore
 Week 17: Multiple types of models implementation
 
 Week 18: Reading Week, Project Reorganisation
+
+Week 19: Presentation Preparation and Milestones
