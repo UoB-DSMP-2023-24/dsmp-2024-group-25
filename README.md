@@ -22,3 +22,5 @@ Week 17: Multiple types of models implementation
 Week 18: Reading Week, Project Reorganisation
 
 Week 19: Presentation Preparation and Milestones
+
+Week 20: Presentation Week
