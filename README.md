@@ -24,3 +24,5 @@ Week 18: Reading Week, Project Reorganisation
 Week 19: Presentation Preparation and Milestones
 
 Week 20: Presentation Week
+
+Week 21: Feature Visualisation for the second dataset, Double check unuseful algorithm
