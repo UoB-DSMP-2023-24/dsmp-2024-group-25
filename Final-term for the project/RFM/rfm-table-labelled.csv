@@ -1,0 +1,11 @@
+Third Party Name,recency,frequency,monetary_value,R_Quartile,F_Quartile,M_Quartile,RFMClass
+Arts & Craft,25,13842,465253.9,1,3,3,133
+Bank,30,5987,4903077.0,4,4,1,441
+Daily,25,11904,495076.80000000005,1,3,3,133
+Fashion & Clothing,25,55048,4601866.48,1,1,1,111
+Food & Drink,25,22693,450435.18999999994,1,2,4,124
+Grocery,25,42604,2896582.54,1,1,1,111
+Indoor Entertainment,25,36340,704090.92,1,1,2,112
+Kids,63,12,2400.0,4,4,4,444
+Large Retailers,25,22885,585893.8700000001,1,2,2,122
+Medical,25,4029,96433.32,1,4,4,144
