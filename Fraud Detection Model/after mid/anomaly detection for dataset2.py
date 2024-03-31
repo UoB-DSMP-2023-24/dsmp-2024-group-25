@@ -58,3 +58,14 @@ formatted_suspicious_transactions_df['Timestamp'] = formatted_suspicious_transac
 suspicious_transactions_file_path = 'D:/TB/DSMP/mid/suspicious_transactions.csv'
 formatted_suspicious_transactions_df.to_csv(suspicious_transactions_file_path, index=False)
 
+# New logic for comprehensive anomaly classification
+anomaly_types = ['Suspicious_Time', 'Frequent_Transactions', 'High_Value_Transaction']
+filtered_transactions_df['Anomaly_Combination'] = filtered_transactions_df[['Suspicious_Time', 'Frequent_Transactions', 'High_Value_Transaction']].apply(
+    lambda row: ', '.join([anomaly for anomaly, flag in zip(['Suspicious_Time', 'Frequent_Transactions', 'High_Value_Transaction'], row) if flag]) or "No Anomaly", axis=1)
+anomaly_combination_counts = filtered_transactions_df['Anomaly_Combination'].value_counts()
+
+# Save new statistics to a CSV file
+anomaly_statistics_path = 'D:/TB/DSMP/mid/anomaly_statistics.csv'
+anomaly_combination_counts.to_csv(anomaly_statistics_path)
+
+
