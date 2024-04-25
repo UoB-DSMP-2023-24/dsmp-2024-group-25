@@ -36,9 +36,14 @@ class MyDataset(Dataset):
     def process(self):
         data = pd.read_csv(self.filepath)
         data['Timestamp'] = pd.to_datetime(data['Timestamp'])
+        data['Balance'] = (data['Balance'] - data['Balance'].mean()) / data['Balance'].std()
+        data['Amount'] = (data['Amount'] - data['Amount'].mean()) / data['Amount'].std()
         grouped = data.groupby(pd.Grouper(key='Timestamp', freq='2H'))
         account_lists = []
 
+        #每次迭代 account_groups，都会处理一个特定的账户在该时间段内的数据
+        #并将这些数据作为一个列表加入到 account_lists 中
+        #这意味着 account_lists 的每一个元素是特定时间段内某个账户的所有交易记录
         for _, group in grouped:
             if not group.empty:
                 account_groups = group.groupby('Account No')
@@ -48,6 +53,7 @@ class MyDataset(Dataset):
         # print(account_lists[0])
         
         
+        #存储每个账户在特定时间内的tag概率
         for i in range(len(account_lists)):
             new_list = [0] * 10
             for j in range(len(account_lists[i])):
