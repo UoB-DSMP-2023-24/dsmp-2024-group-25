@@ -38,7 +38,7 @@ class MyDataset(Dataset):
         data['Timestamp'] = pd.to_datetime(data['Timestamp'])
         data['Balance'] = (data['Balance'] - data['Balance'].mean()) / data['Balance'].std()
         data['Amount'] = (data['Amount'] - data['Amount'].mean()) / data['Amount'].std()
-        grouped = data.groupby(pd.Grouper(key='Timestamp', freq='2H'))
+        grouped = data.groupby(pd.Grouper(key='Timestamp', freq='1H'))
         account_lists = []
 
         #每次迭代 account_groups，都会处理一个特定的账户在该时间段内的数据
