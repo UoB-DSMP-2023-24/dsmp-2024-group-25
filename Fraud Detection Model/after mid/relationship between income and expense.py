@@ -33,7 +33,7 @@ for index, transaction in merged_data.iterrows():
         merged_data.at[index, 'Response Strategy'] = 'User will be prompted to verify transaction safety before proceeding.'
 
 # Filter transactions where the expense exceeds 30% of the average income
-high_ratio_transactions = merged_data[merged_data['Transaction Ratio'] > 0.3]
+high_ratio_transactions = merged_data[merged_data['Transaction Ratio'] > 0.1]
 
 # Save high-ratio transactions to a new dataset
 high_ratio_transactions.to_csv('D:/TB/DSMP/mid/high_ratio_transactions.csv', index=False)
