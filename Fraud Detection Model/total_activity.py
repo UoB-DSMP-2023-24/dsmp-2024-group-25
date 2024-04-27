@@ -1,33 +1,23 @@
 import pandas as pd
-from pandas import ExcelWriter
 
-# load the dataset
-data_path = 'D:/TB2/aaa/total_balance.csv'
-data = pd.read_csv(data_path)
+# Load the new dataset
+new_data_path = 'D:/TB/aaa/first/new_total_balance.csv'
+data = pd.read_csv(new_data_path)
 
-# check the date format
-data_type = data['not_happened_yet_date'].dtype
-data_type
+# Calculate the transaction frequency (number of transactions) for each source account
+transaction_frequency = data['from_totally_fake_account'].value_counts()
 
-# convert date format
-data['not_happened_yet_date'] = pd.to_datetime(data['not_happened_yet_date'], format='%d/%m/%Y', errors='coerce')
+# Calculate the average transaction amount for each source account
+average_transaction_amount = data.groupby('from_totally_fake_account')['monopoly_money_amount'].mean()
 
-# Calculate the transaction frequency and average transaction amount for each source account
-source_account_activity = data.groupby('from_totally_fake_account').agg(
-    transactions_count=pd.NamedAgg(column='monopoly_money_amount', aggfunc='count'),
-    average_transaction_amount=pd.NamedAgg(column='monopoly_money_amount', aggfunc='mean'),
-    total_transaction_amount=pd.NamedAgg(column='monopoly_money_amount', aggfunc='sum')
-).reset_index()
+# update the original dataset
+data['Transaction Frequency'] = data['from_totally_fake_account'].map(transaction_frequency)
+data['Average Transaction Amount'] = data['from_totally_fake_account'].map(average_transaction_amount)
 
-# target account
-target_account_activity = data.groupby('to_randomly_generated_account').agg(
-    transactions_count=pd.NamedAgg(column='monopoly_money_amount', aggfunc='count'),
-    average_transaction_amount=pd.NamedAgg(column='monopoly_money_amount', aggfunc='mean'),
-    total_transaction_amount=pd.NamedAgg(column='monopoly_money_amount', aggfunc='sum')
-).reset_index()
+# Save the updated dataset
+updated_data_path = 'D:/TB/aaa/first/updated_total_balance.csv'
+data.to_csv(updated_data_path, index=False)
 
-# Add to the balance.xlsx
-data = data.merge(source_account_activity, on='from_totally_fake_account', how='left')
-data = data.merge(target_account_activity, on='to_randomly_generated_account', how='left')
+print(f'Updated dataset with transaction frequency and average transaction amount has been saved to {updated_data_path}')
 
-data.to_csv(data_path, index=False)
+

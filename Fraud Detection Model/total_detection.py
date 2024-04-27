@@ -1,34 +1,33 @@
-# Load the required libraries
 import pandas as pd
 import numpy as np
 
 # Load the balance data
-balance_data_path = 'D:/TB2/aaa/total_balance.csv'
-balance_data = pd.read_csv(balance_data_path)
-
-# Display the first few rows of the balance data to understand its structure
-balance_data.head()
+data_path = 'D:/TB/aaa/first/updated_total_balance.csv'
+data = pd.read_csv(data_path)
 
 # Define abnormal account detection function
 def detect_anomalies(df):
-    # Define high-frequency trading threshold as twice the mean
-    high_freq_threshold = df['transactions_count_x'].mean() * 2
-    high_freq_accounts = df[df['transactions_count_x'] > high_freq_threshold]
+    # Define high-frequency transfer threshold as twice the mean
+    high_freq_threshold = df['Transaction Frequency'].mean() * 2
+    high_freq_accounts = df[df['Transaction Frequency'] > high_freq_threshold]
     
     # Define large transactions as exceeding 80% of the total account amount
-    large_trans_accounts = df[df['average_transaction_amount_x'] > df['source_account_total'] * 0.8]
+    large_trans_accounts = df[df['Average Transaction Amount'] > df['source_account_total'] * 0.8]
     
-    # Define low-frequency high-value trading accounts
-    low_freq_large_trans_accounts = df[(df['transactions_count_x'] <= df['transactions_count_x'].median()) & (df['average_transaction_amount_x'] > df['source_account_total'] * 0.8)]
+    # Define low-frequency high-value transfer accounts
+    low_freq_large_trans_accounts = df[(df['Transaction Frequency'] <= df['Transaction Frequency'].median()) & (df['Average Transaction Amount'] > df['source_account_total'] * 0.8)]
     
     # Merge the accounts
-    anomalies = pd.concat([high_freq_accounts.assign(Anomaly_Type='High Frequency'),
-                           large_trans_accounts.assign(Anomaly_Type='Large Transaction'),
-                           low_freq_large_trans_accounts.assign(Anomaly_Type='Low Frequency Large Transaction')], ignore_index=True)
+    anomalies = pd.concat([
+        high_freq_accounts.assign(Anomaly_Type='High Frequency'),
+        large_trans_accounts.assign(Anomaly_Type='Large Transaction'),
+        low_freq_large_trans_accounts.assign(Anomaly_Type='Low Frequency Large Transaction')
+    ], ignore_index=True)
+    
     return anomalies
 
 # Detect anomaly account
-anomalies = detect_anomalies(balance_data)
+anomalies = detect_anomalies(data)
 
 # Save the output
-anomalies.to_csv('D:/TB2/aaa/anomalies_detected.csv', index=False)
+anomalies.to_csv('D:/TB/aaa/first/anomalies_detected.csv', index=False)
