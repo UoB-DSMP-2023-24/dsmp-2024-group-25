@@ -4,7 +4,7 @@ import pandas as pd
 new_data_path = 'D:/TB/aaa/first/new_total_balance.csv'
 data = pd.read_csv(new_data_path)
 
-# Calculate the transaction frequency (number of transactions) for each source account
+# Calculate the transaction frequency for each source account
 transaction_frequency = data['from_totally_fake_account'].value_counts()
 
 # Calculate the average transaction amount for each source account
