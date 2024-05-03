@@ -10,11 +10,11 @@ sample_data = pd.read_excel(sample_data_path)
 
 # Randomly generated total amount for source account
 source_accounts = sample_data['from_totally_fake_account'].unique()  
-source_account_totals = {account: np.random.rand() * 10000 for account in source_accounts}  # 为每个账户生成随机总额
+source_account_totals = {account: np.random.rand() * 10000 for account in source_accounts} 
 
 # Randomly generated total amount for target account
 target_accounts = sample_data['to_randomly_generated_account'].unique()  
-target_account_totals = {account: np.random.rand() * 10000 for account in target_accounts}  # 为每个账户生成随机总额
+target_account_totals = {account: np.random.rand() * 10000 for account in target_accounts}  
 
 # Add the total amount to  the dataset
 sample_data['source_account_total'] = sample_data['from_totally_fake_account'].map(source_account_totals)
